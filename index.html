@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FANTOM - Snap Manager</title>
+<style>
+body {
+  background: #090b10;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+h1 { color: #fffc00; }
+.card {
+  background: #171a24;
+  padding: 20px;
+  border-radius: 15px;
+  margin-top: 25px;
+}
+input, button {
+  padding: 12px;
+  margin: 7px;
+  border-radius: 8px;
+  border: none;
+}
+button {
+  background: #fffc00;
+  font-weight: bold;
+}
+li { padding: 8px; text-align: left; }
+</style>
+</head>
+<body>
+<h1>FANTOM</h1>
+<p>SNAP GROUP MANAGER</p>
+
+<div class="card">
+  <h3>Gestion des membres</h3>
+  <input id="nom" placeholder="Nom du membre">
+  <button onclick="ajouter()">Ajouter</button>
+  <ul id="liste"></ul>
+  <button onclick="selectionner()">Voir la sélection</button>
+  <p id="resultat"></p>
+</div>
+
+<script>
+function ajouter() {
+  const champ = document.getElementById("nom");
+  const nom = champ.value.trim();
+  if (!nom) return;
+
+  const li = document.createElement("li");
+  const cb = document.createElement("input");
+  cb.type = "checkbox";
+  li.appendChild(cb);
+  li.appendChild(document.createTextNode(" " + nom));
+  document.getElementById("liste").appendChild(li);
+  champ.value = "";
+}
+
+function selectionner() {
+  const cases = document.querySelectorAll("#liste input:checked");
+  const noms = Array.from(cases, c =>
+    c.parentElement.textContent.trim()
+  );
+  document.getElementById("resultat").textContent =
+    noms.length ? "Sélection : " + noms.join(", ")
+    : "Aucun membre sélectionné.";
+}
+</script>
+</body>
+</html>
