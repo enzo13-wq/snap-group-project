@@ -6,9 +6,7 @@
 <title>FANTOM // Dashboard</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -49,9 +47,10 @@ h2 {
 }
 
 input, textarea, button {
+  display: block;
   width: 100%;
   padding: 12px;
-  margin: 6px 0;
+  margin: 8px 0;
   border-radius: 7px;
   border: 1px solid #333;
   background: #080b10;
@@ -66,19 +65,13 @@ button {
   cursor: pointer;
 }
 
-button:active {
-  opacity: 0.7;
-}
-
 .entry {
   border-bottom: 1px solid #333;
   padding: 12px 0;
   overflow-wrap: anywhere;
 }
 
-small {
-  color: #999;
-}
+small { color: #999; }
 
 #output {
   white-space: pre-wrap;
@@ -90,20 +83,20 @@ small {
 
 <body>
 <main>
-
 <h1>FANTOM</h1>
-<p class="sub">PERSONAL DASHBOARD // v1.0</p>
+<p class="sub">PERSONAL DASHBOARD // v2.0</p>
 
 <section class="card">
 <h2>01 / AJOUTER UN PROFIL</h2>
-<input id="pseudo" placeholder="Pseudo">
-<textarea id="note" placeholder="Notes personnelles (facultatif)" rows="2"></textarea>
-<button onclick="addProfile()">+ AJOUTER</button>
+<input id="pseudo" placeholder="Écris un pseudo">
+<textarea id="note" placeholder="Note facultative" rows="2"></textarea>
+<button id="addBtn" type="button">+ AJOUTER</button>
+<p id="addStatus" role="status"></p>
 </section>
 
 <section class="card">
 <h2>02 / RECHERCHE</h2>
-<input id="search" placeholder="Rechercher un pseudo ou une note..." oninput="render()">
+<input id="search" placeholder="Rechercher un pseudo ou une note...">
 <div id="list"></div>
 <p id="count">0 profil</p>
 </section>
@@ -111,156 +104,225 @@ small {
 <section class="card">
 <h2>03 / CONSOLE</h2>
 <input id="cmd" placeholder="/help">
-<button onclick="runCommand()">EXÉCUTER</button>
+<button id="runBtn" type="button">EXÉCUTER</button>
 <p id="output">Tape /help pour voir les commandes.</p>
 </section>
 
 <section class="card">
 <h2>04 / CONFIDENTIALITÉ</h2>
 <small>
-Les profils et notes sont enregistrés dans le navigateur de cet appareil.
-Ne saisis pas de mots de passe, de codes privés ni d'informations sensibles.
-Ce tableau de bord ne se connecte pas à Snapchat.
+Cette page gère uniquement ta liste personnelle. Elle ne se connecte
+pas à Snapchat et ne peut pas modifier les membres d'un groupe.
+Les données restent dans le stockage du navigateur utilisé.
+N'entre pas de mot de passe ni de code privé.
 </small>
 </section>
-
 </main>
 
 <script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
 let profiles = [];
+let storageAvailable = true;
 
 try {
-  const saved = JSON.parse(
-    localStorage.getItem("fantom-profiles") || "[]"
-  );
+  const saved = localStorage.getItem("fantom-profiles-v2");
+  const parsed = saved ? JSON.parse(saved) : [];
 
-  if (Array.isArray(saved)) {
-    profiles = saved;
+  if (Array.isArray(parsed)) {
+    profiles = parsed.filter(p =>
+      p &&
+      typeof p.pseudo === "string" &&
+      typeof (p.note || "") === "string"
+    );
   }
-} catch (e) {
-  profiles = [];
+} catch (error) {
+  storageAvailable = false;
 }
 
 function save() {
   try {
     localStorage.setItem(
-      "fantom-profiles",
+      "fantom-profiles-v2",
       JSON.stringify(profiles)
     );
-  } catch (e) {
-    document.getElementById("output").textContent =
-      "Enregistrement indisponible dans ce navigateur.";
+    storageAvailable = true;
+    return true;
+  } catch (error) {
+    storageAvailable = false;
+    $("output").textContent =
+      "Impossible d'enregistrer. Vérifie les réglages du navigateur.";
+    $("addStatus").textContent =
+      "L'enregistrement a échoué.";
+    return false;
   }
-
-  render();
 }
 
 function addProfile() {
-  const pseudo = document.getElementById("pseudo").value.trim();
-  const note = document.getElementById("note").value.trim();
+  const pseudo = $("pseudo").value.trim();
+  const note = $("note").value.trim();
 
   if (!pseudo) {
-    alert("Entre un pseudo.");
+    $("addStatus").textContent = "Écris un pseudo avant d'ajouter.";
+    $("pseudo").focus();
     return;
   }
 
-  profiles.push({
-    pseudo: pseudo,
-    note: note
-  });
+  profiles.push({ pseudo, note });
 
-  document.getElementById("pseudo").value = "";
-  document.getElementById("note").value = "";
+  if (!save()) {
+    profiles.pop();
+    return;
+  }
 
-  save();
+  $("pseudo").value = "";
+  $("note").value = "";
+  $("addStatus").textContent = "Profil ajouté !";
+  render();
 }
 
 function render() {
-  const q = document.getElementById("search").value.toLowerCase();
-  const list = document.getElementById("list");
+  const query = $("search").value.trim().toLowerCase();
+  const list = $("list");
 
   list.replaceChildren();
 
-  profiles.forEach((p, i) => {
-    if ((p.pseudo + " " + (p.note || "")).toLowerCase().includes(q)) {
-      const div = document.createElement("div");
-      div.className = "entry";
+  let visibleCount = 0;
 
-      const title = document.createElement("strong");
-      title.textContent = p.pseudo;
+  profiles.forEach((profile, index) => {
+    const pseudo = profile.pseudo;
+    const noteText = profile.note || "";
 
-      const note = document.createElement("p");
-      note.textContent = p.note || "Aucune note";
-
-      const del = document.createElement("button");
-      del.textContent = "RETIRER DE MA LISTE";
-
-      del.onclick = () => {
-        profiles.splice(i, 1);
-        save();
-      };
-
-      div.append(title, note, del);
-      list.appendChild(div);
+    if (!(pseudo + " " + noteText).toLowerCase().includes(query)) {
+      return;
     }
+
+    visibleCount++;
+
+    const entry = document.createElement("div");
+    entry.className = "entry";
+
+    const title = document.createElement("strong");
+    title.textContent = pseudo;
+
+    const note = document.createElement("p");
+    note.textContent = noteText || "Aucune note";
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "RETIRER DE MA LISTE";
+
+    remove.addEventListener("click", () => {
+      const removed = profiles.splice(index, 1);
+      if (!save()) {
+        profiles.splice(index, 0, ...removed);
+        render();
+        return;
+      }
+      $("addStatus").textContent = "Profil retiré de ta liste.";
+      render();
+    });
+
+    entry.append(title, note, remove);
+    list.appendChild(entry);
   });
 
-  document.getElementById("count").textContent =
-    profiles.length + " profil(s)";
+  $("count").textContent =
+    visibleCount + " résultat(s) — " + profiles.length + " profil(s) au total";
+
+  if (visibleCount === 0) {
+    const empty = document.createElement("p");
+    empty.textContent = query
+      ? "Aucun résultat pour cette recherche."
+      : "Aucun profil. Ajoute-en un ci-dessus.";
+    list.appendChild(empty);
+  }
 }
 
 function runCommand() {
-  const input = document.getElementById("cmd").value.trim();
+  const input = $("cmd").value.trim();
   const parts = input.split(/\s+/);
   const action = (parts.shift() || "").toLowerCase();
   const name = parts.join(" ");
-  const out = document.getElementById("output");
+  const out = $("output");
 
   if (action === "/help") {
     out.textContent =
       "/help : afficher l'aide\n" +
       "/add pseudo : ajouter un profil\n" +
-      "/list : afficher la liste\n" +
-      "/search pseudo : rechercher un profil\n" +
-      "/remove pseudo : retirer un profil de la liste locale";
+      "/list : afficher les profils\n" +
+      "/search pseudo : rechercher dans ta liste\n" +
+      "/remove pseudo : retirer de ta liste locale";
 
   } else if (action === "/add" && name) {
     profiles.push({ pseudo: name, note: "" });
-    save();
-    out.textContent = "Profil ajouté.";
+
+    if (!save()) {
+      profiles.pop();
+      return;
+    }
+
+    out.textContent = "Profil ajouté : " + name;
+    render();
 
   } else if (action === "/list") {
-    out.textContent =
-      profiles.map(p => p.pseudo).join("\n") || "Aucun profil.";
+    out.textContent = profiles.map(p => p.pseudo).join("\n")
+      || "Aucun profil enregistré.";
 
   } else if (action === "/search" && name) {
     const results = profiles.filter(p =>
-      p.pseudo.toLowerCase().includes(name.toLowerCase())
+      p.pseudo.toLowerCase().includes(name.toLowerCase()) ||
+      (p.note || "").toLowerCase().includes(name.toLowerCase())
     );
 
-    out.textContent =
-      results.map(p => p.pseudo).join("\n") || "Aucun résultat.";
+    out.textContent = results.map(p => p.pseudo).join("\n")
+      || "Aucun résultat.";
 
   } else if (action === "/remove" && name) {
     const index = profiles.findIndex(p =>
       p.pseudo.toLowerCase() === name.toLowerCase()
     );
 
-    if (index !== -1) {
-      profiles.splice(index, 1);
-      save();
-      out.textContent = "Profil retiré de ta liste.";
-    } else {
-      out.textContent = "Profil introuvable.";
+    if (index < 0) {
+      out.textContent = "Pseudo introuvable dans ta liste.";
+      return;
     }
+
+    const removed = profiles.splice(index, 1);
+
+    if (!save()) {
+      profiles.splice(index, 0, ...removed);
+      return;
+    }
+
+    out.textContent = "Profil retiré de ta liste.";
+    render();
 
   } else {
     out.textContent = "Commande inconnue. Tape /help.";
   }
 }
 
-render();
-</script>
+$("addBtn").addEventListener("click", addProfile);
+$("runBtn").addEventListener("click", runCommand);
+$("search").addEventListener("input", render);
 
+$("cmd").addEventListener("keydown", event => {
+  if (event.key === "Enter") runCommand();
+});
+
+$("pseudo").addEventListener("keydown", event => {
+  if (event.key === "Enter") addProfile();
+});
+
+render();
+
+if (!storageAvailable) {
+  $("addStatus").textContent =
+    "Attention : le stockage du navigateur est peut-être indisponible.";
+}
+</script>
 </body>
 </html>
