@@ -1,259 +1,355 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FANTOM // Dashboard</title>
+<meta name="theme-color" content="#07090d">
+<title>FANTOM // V7.0</title>
 <style>
-:root{--bg:#07090d;--panel:#10151d;--line:#263241;--text:#e9f1fb;--muted:#8b9aab;--red:#ff334f;--cyan:#52e6d4}
+:root{--bg:#07090d;--panel:#10151d;--line:#293748;--text:#e9f1fb;--muted:#8b9aab;--red:#ff334f;--cyan:#52e6d4}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at top,#17202b 0,#07090d 45%);color:var(--text);font:15px/1.5 system-ui,sans-serif}
-header{padding:26px 18px 18px;text-align:center;border-bottom:1px solid var(--line)}
-.logo{font-weight:900;font-size:42px;letter-spacing:5px;color:var(--red);text-shadow:0 0 18px #ff334f44}
-.sub{font-size:11px;letter-spacing:3px;color:var(--muted)}
-main{width:min(920px,100%);margin:auto;padding:18px;display:grid;gap:14px}
-.panel{background:#10151def;border:1px solid var(--line);border-radius:14px;padding:16px}
-h2{font-size:13px;letter-spacing:2px;color:var(--cyan);margin:0 0 14px}
+body{margin:0;background:radial-gradient(ellipse at top,#172432,#07090d 55%);color:var(--text);font:15px/1.5 system-ui,sans-serif;min-height:100vh}
+header{text-align:center;padding:28px 16px;border-bottom:1px solid var(--line)}
+.logo{font-size:42px;font-weight:950;letter-spacing:7px;color:var(--red);text-shadow:0 0 22px #ff334f66}
+.sub{font-size:10px;letter-spacing:3px;color:var(--cyan)}
+main{width:min(950px,100%);padding:16px;margin:auto;display:grid;gap:14px}
+.panel{background:#10151df2;border:1px solid var(--line);border-radius:14px;padding:17px;min-width:0}
+h2{font-size:12px;letter-spacing:2px;color:var(--cyan);margin:0 0 14px}
 label{display:block;color:var(--muted);font-size:12px;margin:10px 0 5px}
 input,textarea{width:100%;background:#080c12;border:1px solid #344355;border-radius:8px;padding:11px;color:var(--text);font:inherit}
 textarea{resize:vertical;min-height:70px}
-button{border:1px solid var(--line);background:#182330;color:var(--text);padding:10px 13px;border-radius:8px;font-weight:700;cursor:pointer}
-button:hover{border-color:var(--cyan)}
+button,.button{display:inline-block;text-align:center;border:1px solid var(--line);background:#182330;color:var(--text);padding:10px 13px;border-radius:8px;font-weight:750;cursor:pointer;text-decoration:none;font:inherit}
+button:hover,.button:hover{border-color:var(--cyan)}
 .primary{background:var(--red);border-color:var(--red);color:white}
-.danger{border-color:#78313b;color:#ff8b99}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.row>*{flex:1}
+.snap{background:#fffc00;border-color:#fffc00;color:#111;font-weight:850}
+.danger{color:#ff8b99;border-color:#78313b}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1;min-width:0}
 .small{font-size:12px;color:var(--muted)}
 .notice{font-size:12px;color:var(--muted);border-left:3px solid var(--cyan);padding-left:10px}
-.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-.stat{border:1px solid var(--line);padding:8px 12px;border-radius:8px;color:var(--muted);font-size:12px}
-.stat b{color:var(--text);font-size:17px;margin-right:5px}
-.member{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:9px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start}
-.member input[type=checkbox]{width:18px;margin-top:4px;accent-color:var(--red)}
-.member-name{font-weight:800;overflow-wrap:anywhere}
-.member-note{color:var(--muted);font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
-.empty{color:var(--muted);text-align:center;padding:20px 5px}
-footer{text-align:center;color:var(--muted);font-size:11px;padding:0 18px 25px}
+.empty{text-align:center;padding:22px 5px;color:var(--muted)}
+.member{border:1px solid var(--line);padding:12px;border-radius:9px;margin-top:9px;overflow-wrap:anywhere}
+.member-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.pseudo{font-weight:850;overflow-wrap:anywhere}
+.badge{font-size:10px;color:var(--cyan);border:1px solid #245d59;padding:3px 7px;border-radius:6px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0}
+.stat{border:1px solid var(--line);border-radius:9px;padding:12px}
+.stat span{display:block;color:var(--muted);font-size:11px}
+.stat strong{font-size:22px;overflow-wrap:anywhere}
+.profile-head{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.avatar{width:64px;height:64px;border-radius:50%;border:1px solid var(--cyan);background:#080c12;display:grid;place-items:center;font-size:28px;overflow:hidden;flex-shrink:0}
+.avatar img{width:100%;height:100%;object-fit:cover}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:5px 16px 25px}
 @media(min-width:700px){main{grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}}
 </style>
 </head>
 <body>
 <header>
   <div class="logo">FANTOM</div>
-  <div class="sub">PUBLIC PROFILE DASHBOARD // V4.0</div>
+  <div class="sub">PROFILE SEARCH SYSTEM // V7.0</div>
+  <p><span class="badge">LOCAL DASHBOARD</span></p>
 </header>
 
 <main>
   <section class="panel">
-    <h2>01 / RECHERCHE</h2>
-    <label for="lookup">Pseudo Snapchat</label>
-    <input id="lookup" placeholder="Entre un pseudo Snapchat">
-    <button class="primary" id="searchBtn" style="width:100%;margin-top:10px">RECHERCHER DANS MA LISTE</button>
-    <p class="small">Cette recherche consulte uniquement les profils enregistrés dans FANTOM. Elle ne se connecte pas à Snapchat.</p>
+    <h2>01 / RECHERCHER UN PROFIL</h2>
+    <label for="search">Nom d'utilisateur Snapchat</label>
+    <input id="search" maxlength="100" placeholder="Ex. pseudo123">
+    <button class="primary" id="searchBtn" style="width:100%;margin-top:10px">RECHERCHER LE PROFIL</button>
+    <p class="small">Recherche dans ta liste FANTOM. Ce n'est pas une recherche automatique sur Snapchat.</p>
   </section>
 
   <section class="panel">
     <h2>02 / AJOUTER UN PROFIL</h2>
-    <label for="pseudo">Nom d’utilisateur</label>
-    <input id="pseudo" maxlength="80" placeholder="Ex. pseudo123">
-    <label for="displayName">Nom affiché publiquement (facultatif)</label>
+    <label for="username">Nom d'utilisateur Snapchat</label>
+    <input id="username" maxlength="100" placeholder="pseudo123">
+    <label for="displayName">Nom du profil</label>
     <input id="displayName" maxlength="100" placeholder="Nom affiché">
-    <label for="bio">Bio ou lien public (facultatif)</label>
-    <textarea id="bio" maxlength="1000" placeholder="Informations publiques que tu connais"></textarea>
-    <label for="location">Ville volontairement partagée (facultatif)</label>
-    <input id="location" maxlength="100" placeholder="Ville, si la personne l’a partagée">
-    <button class="primary" id="addBtn" style="width:100%;margin-top:10px">+ ENREGISTRER LE PROFIL</button>
+    <label for="avatarUrl">Lien d'image (facultatif)</label>
+    <input id="avatarUrl" type="url" maxlength="1000" placeholder="https://...">
+    <label for="note">Note facultative</label>
+    <textarea id="note" maxlength="1000" placeholder="Note personnelle"></textarea>
+    <div class="row" style="margin-top:12px">
+      <button class="primary" id="addBtn">ENREGISTRER</button>
+      <button id="clearForm">VIDER</button>
+    </div>
   </section>
 
   <section class="panel wide">
-    <h2>03 / RÉSULTATS</h2>
-    <div id="result" class="empty">Entre un pseudo pour rechercher un profil enregistré.</div>
+    <h2>03 / FICHE DU PROFIL</h2>
+    <div id="profileView" class="empty">Recherche ou sélectionne un profil enregistré.</div>
   </section>
 
   <section class="panel wide">
-    <h2>04 / PROFILS ENREGISTRÉS</h2>
-    <div class="row">
-      <input id="filter" placeholder="Filtrer les profils enregistrés">
-      <button id="selectAll">TOUT SÉLECTIONNER</button>
-    </div>
-    <div class="stats">
-      <div class="stat"><b id="total">0</b> profil(s)</div>
-      <div class="stat"><b id="selectedCount">0</b> sélectionné(s)</div>
-    </div>
+    <h2>04 / MES PROFILS</h2>
+    <input id="filter" placeholder="Filtrer par pseudo ou nom">
     <div id="profiles"><div class="empty">Aucun profil enregistré.</div></div>
     <div class="row" style="margin-top:12px">
-      <button class="danger" id="deleteSelected">SUPPRIMER LA SÉLECTION</button>
-      <button id="unselect">DÉCOCHER</button>
+      <button id="exportBtn">EXPORTER EN JSON</button>
+      <button class="danger" id="deleteAll">TOUT EFFACER</button>
     </div>
   </section>
 
   <section class="panel wide">
-    <h2>05 / CONFIDENTIALITÉ</h2>
-    <p class="notice">FANTOM ne peut pas déterminer le vrai nom, l’adresse ou la position GPS d’une personne à partir de son seul pseudo. Les champs de cette page sont renseignés manuellement. N’enregistre que des informations publiques ou partagées avec autorisation.</p>
+    <h2>05 / STATISTIQUES MANUELLES</h2>
+    <p class="small">Renseigne uniquement les chiffres que tu connais. Ils ne sont pas récupérés automatiquement depuis Snapchat.</p>
+    <label for="msgCount">Nombre de messages</label>
+    <input id="msgCount" type="number" min="0" step="1" placeholder="Non renseigné">
+    <label for="photoCount">Nombre de photos échangées</label>
+    <input id="photoCount" type="number" min="0" step="1" placeholder="Non renseigné">
+    <button class="primary" id="saveStats" style="width:100%;margin-top:12px">ENREGISTRER LES COMPTEURS</button>
+    <p class="notice">Un pseudo seul ne permet pas de connaître les statistiques privées d'une personne.</p>
   </section>
 </main>
 
-<footer>FANTOM // OUTIL PERSONNEL NON AFFILIÉ À SNAP INC.</footer>
+<footer>FANTOM V7.0 // OUTIL PERSONNEL NON AFFILIÉ À SNAP INC.</footer>
 
 <script>
 (function(){
   const $ = id => document.getElementById(id);
-  const KEY = "fantom-public-profiles-v4";
+  const KEY = "fantom-v7-profiles";
   let profiles = [];
-  let selected = new Set();
+  let currentId = null;
 
   try {
     const saved = JSON.parse(localStorage.getItem(KEY) || "[]");
-    if (Array.isArray(saved)) profiles = saved;
-  } catch (e) {
+    if(Array.isArray(saved)) profiles = saved;
+  } catch(e) {
     profiles = [];
   }
 
+  profiles = profiles.filter(p => p && typeof p === "object" && p.username)
+    .map(p => ({
+      id:String(p.id || makeId()),
+      username:String(p.username),
+      displayName:String(p.displayName || ""),
+      avatarUrl:String(p.avatarUrl || ""),
+      note:String(p.note || ""),
+      msgCount:p.msgCount ?? "",
+      photoCount:p.photoCount ?? ""
+    }));
+
+  function makeId(){
+    return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+  }
+
   function save(){
-    localStorage.setItem(KEY, JSON.stringify(profiles));
+    try {
+      localStorage.setItem(KEY,JSON.stringify(profiles));
+    } catch(e) {
+      alert("Sauvegarde locale impossible sur cet appareil.");
+    }
   }
 
   function esc(value){
-    return String(value || "").replace(/[&<>"']/g, c => ({
+    return String(value ?? "").replace(/[&<>"']/g,c=>({
       "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
     }[c]));
   }
 
+  function validCount(value){
+    if(value === "" || value == null) return "";
+    const n = Number(value);
+    return Number.isSafeInteger(n) && n >= 0 ? n : "";
+  }
+
+  function snapUrl(username){
+    return "https://www.snapchat.com/add/" + encodeURIComponent(username);
+  }
+
+  function showProfile(p){
+    currentId = p.id;
+    $("msgCount").value = p.msgCount;
+    $("photoCount").value = p.photoCount;
+
+    const image = p.avatarUrl && /^https:\/\/\S+$/i.test(p.avatarUrl)
+      ? `<img src="${esc(p.avatarUrl)}" alt="" referrerpolicy="no-referrer" onerror="this.parentElement.textContent='👻'">`
+      : "👻";
+
+    $("profileView").className = "";
+    $("profileView").innerHTML = `
+      <div class="profile-head">
+        <div class="avatar">${image}</div>
+        <div>
+          <div class="pseudo">${esc(p.displayName || "Nom non renseigné")}</div>
+          <div class="small">@${esc(p.username)}</div>
+          <span class="badge">PROFIL ENREGISTRÉ</span>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><span>Messages (saisie manuelle)</span><strong>${p.msgCount === "" ? "—" : esc(p.msgCount)}</strong></div>
+        <div class="stat"><span>Photos (saisie manuelle)</span><strong>${p.photoCount === "" ? "—" : esc(p.photoCount)}</strong></div>
+      </div>
+      <div class="member">
+        <div class="small">Nom du profil</div>
+        <div>${esc(p.displayName || "Non renseigné")}</div>
+        <div class="small" style="margin-top:8px">Nom d'utilisateur</div>
+        <div>@${esc(p.username)}</div>
+        <div class="small" style="margin-top:8px">Note</div>
+        <div>${esc(p.note || "Aucune note")}</div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <a class="button snap" href="${esc(snapUrl(p.username))}" target="_blank" rel="noopener noreferrer">👻 OUVRIR LE SNAP</a>
+        <button class="danger" id="deleteCurrent">SUPPRIMER</button>
+      </div>
+      <p class="notice">Les informations de cette fiche sont celles que tu as saisies. Le bouton ouvre le lien Snapchat correspondant au pseudo.</p>
+    `;
+
+    $("deleteCurrent").addEventListener("click",()=>{
+      if(!confirm("Supprimer ce profil de FANTOM ?")) return;
+      profiles = profiles.filter(x=>x.id !== currentId);
+      currentId = null;
+      save();
+      render();
+      $("profileView").className = "empty";
+      $("profileView").textContent = "Profil supprimé.";
+      $("msgCount").value = "";
+      $("photoCount").value = "";
+    });
+  }
+
   function render(){
-    const query = $("filter").value.trim().toLowerCase();
+    const q = $("filter").value.trim().toLowerCase();
     const shown = profiles.filter(p =>
-      [p.pseudo,p.name,p.bio,p.location].join(" ").toLowerCase().includes(query)
+      [p.username,p.displayName,p.note].join(" ").toLowerCase().includes(q)
     );
 
-    $("total").textContent = profiles.length;
-    $("selectedCount").textContent = selected.size;
-
-    if (!shown.length){
-      $("profiles").innerHTML = '<div class="empty">Aucun profil trouvé.</div>';
-      return;
-    }
-
-    $("profiles").innerHTML = shown.map(p => `
+    $("profiles").innerHTML = shown.length ? shown.map(p=>`
       <div class="member">
-        <input type="checkbox" data-check="${esc(p.id)}"
-          ${selected.has(p.id) ? "checked" : ""}
-          aria-label="Sélectionner le profil">
-        <div>
-          <div class="member-name">${esc(p.pseudo)}</div>
-          <div class="member-note">
-            ${p.name ? "Nom affiché : " + esc(p.name) + "\n" : ""}
-            ${p.location ? "Ville partagée : " + esc(p.location) + "\n" : ""}
-            ${p.bio ? "Bio / lien public : " + esc(p.bio) : ""}
+        <div class="member-top">
+          <div>
+            <div class="pseudo">${esc(p.displayName || "Nom non renseigné")}</div>
+            <div class="small">@${esc(p.username)}</div>
           </div>
+          <button data-open="${esc(p.id)}">VOIR LA FICHE</button>
         </div>
-        <button class="danger" data-delete="${esc(p.id)}">SUPPRIMER</button>
       </div>
-    `).join("");
+    `).join("") : '<div class="empty">Aucun profil trouvé.</div>';
 
-    $("profiles").querySelectorAll("[data-check]").forEach(el => {
-      el.addEventListener("change", () => {
-        const id = el.dataset.check;
-        if (el.checked) selected.add(id);
-        else selected.delete(id);
-        render();
-      });
-    });
-
-    $("profiles").querySelectorAll("[data-delete]").forEach(el => {
-      el.addEventListener("click", () => {
-        const id = el.dataset.delete;
-        profiles = profiles.filter(p => p.id !== id);
-        selected.delete(id);
-        save();
-        render();
-        $("result").textContent = "Profil supprimé de ta liste FANTOM.";
+    $("profiles").querySelectorAll("[data-open]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const p = profiles.find(x=>x.id === btn.dataset.open);
+        if(p) showProfile(p);
       });
     });
   }
 
   function searchProfile(){
-    const q = $("lookup").value.trim().toLowerCase();
-    if (!q){
-      $("result").textContent = "Entre un pseudo pour commencer.";
+    const q = $("search").value.trim().replace(/^@/,"").toLowerCase();
+    if(!q){
+      $("profileView").className = "empty";
+      $("profileView").textContent = "Entre un nom d'utilisateur.";
       return;
     }
-    const p = profiles.find(p => p.pseudo.toLowerCase() === q);
-    if (!p){
-      $("result").innerHTML = '<div class="empty">Profil introuvable dans ta liste. Ajoute-le dans la section 02.</div>';
+    const p = profiles.find(x=>x.username.toLowerCase() === q);
+    if(!p){
+      $("profileView").className = "empty";
+      $("profileView").textContent = "Profil introuvable dans ta liste. Ajoute-le dans la section 02.";
       return;
     }
-    $("result").innerHTML = `
-      <div class="member" style="grid-template-columns:1fr">
-        <div class="member-name">@${esc(p.pseudo)}</div>
-        <div><span class="small">Nom affiché</span><br>${esc(p.name || "Information non renseignée")}</div>
-        <div><span class="small">Ville partagée</span><br>${esc(p.location || "Information non renseignée")}</div>
-        <div><span class="small">Bio / lien public</span><br>${esc(p.bio || "Information non renseignée")}</div>
-        <p class="notice">Ces informations ont été saisies manuellement. Elles ne sont pas vérifiées automatiquement par Snapchat.</p>
-      </div>
-    `;
+    showProfile(p);
   }
 
-  $("addBtn").addEventListener("click", () => {
-    const pseudo = $("pseudo").value.trim();
-    if (!pseudo){
-      alert("Entre un pseudo.");
-      $("pseudo").focus();
+  $("addBtn").addEventListener("click",()=>{
+    const username = $("username").value.trim().replace(/^@/,"");
+    const displayName = $("displayName").value.trim();
+    const avatarUrl = $("avatarUrl").value.trim();
+    const note = $("note").value.trim();
+
+    if(!username){
+      alert("Entre le nom d'utilisateur Snapchat.");
+      $("username").focus();
       return;
     }
-    if (profiles.some(p => p.pseudo.toLowerCase() === pseudo.toLowerCase())){
-      alert("Ce pseudo est déjà enregistré.");
+    if(/\s/.test(username)){
+      alert("Le nom d'utilisateur ne doit pas contenir d'espaces.");
+      return;
+    }
+    if(avatarUrl && !/^https:\/\/\S+$/i.test(avatarUrl)){
+      alert("Le lien d'image doit commencer par https://.");
       return;
     }
 
-    profiles.unshift({
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
-      pseudo,
-      name: $("displayName").value.trim(),
-      bio: $("bio").value.trim(),
-      location: $("location").value.trim()
-    });
+    const existing = profiles.find(p=>p.username.toLowerCase()===username.toLowerCase());
+    if(existing){
+      existing.displayName = displayName;
+      existing.avatarUrl = avatarUrl;
+      existing.note = note;
+      save();render();showProfile(existing);
+      alert("Profil existant mis à jour.");
+      return;
+    }
 
+    const p = {
+      id:makeId(),username,displayName,avatarUrl,note,
+      msgCount:"",photoCount:""
+    };
+    profiles.unshift(p);
+    save();render();showProfile(p);
+    $("username").value="";
+    $("displayName").value="";
+    $("avatarUrl").value="";
+    $("note").value="";
+  });
+
+  $("searchBtn").addEventListener("click",searchProfile);
+  $("search").addEventListener("keydown",e=>{
+    if(e.key==="Enter") searchProfile();
+  });
+
+  $("clearForm").addEventListener("click",()=>{
+    ["username","displayName","avatarUrl","note"].forEach(id=>$(id).value="");
+  });
+
+  $("filter").addEventListener("input",render);
+
+  $("saveStats").addEventListener("click",()=>{
+    const p = profiles.find(x=>x.id===currentId);
+    if(!p){
+      alert("Recherche ou sélectionne d'abord un profil.");
+      return;
+    }
+
+    const msg = $("msgCount").value;
+    const photos = $("photoCount").value;
+    if((msg!=="" && validCount(msg)==="") || (photos!=="" && validCount(photos)==="")){
+      alert("Entre des nombres entiers positifs ou laisse le champ vide.");
+      return;
+    }
+
+    p.msgCount = validCount(msg);
+    p.photoCount = validCount(photos);
     save();
-    $("pseudo").value = "";
-    $("displayName").value = "";
-    $("bio").value = "";
-    $("location").value = "";
-    render();
-    $("result").textContent = "Profil enregistré dans FANTOM.";
-  });
-
-  $("searchBtn").addEventListener("click", searchProfile);
-  $("lookup").addEventListener("keydown", e => {
-    if (e.key === "Enter") searchProfile();
-  });
-  $("filter").addEventListener("input", render);
-
-  $("selectAll").addEventListener("click", () => {
-    const q = $("filter").value.trim().toLowerCase();
-    const shown = profiles.filter(p =>
-      [p.pseudo,p.name,p.bio,p.location].join(" ").toLowerCase().includes(q)
-    );
-    const allSelected = shown.length && shown.every(p => selected.has(p.id));
-    shown.forEach(p => allSelected ? selected.delete(p.id) : selected.add(p.id));
+    showProfile(p);
     render();
   });
 
-  $("unselect").addEventListener("click", () => {
-    selected.clear();
-    render();
+  $("exportBtn").addEventListener("click",()=>{
+    const blob = new Blob([JSON.stringify(profiles,null,2)],{type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href=url;
+    a.download="fantom-v7-profils.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
 
-  $("deleteSelected").addEventListener("click", () => {
-    if (!selected.size){
-      alert("Sélectionne au moins un profil.");
+  $("deleteAll").addEventListener("click",()=>{
+    if(!profiles.length){
+      alert("Aucun profil à supprimer.");
       return;
     }
-    if (!confirm("Supprimer les profils sélectionnés de ta liste FANTOM ?")) return;
-    profiles = profiles.filter(p => !selected.has(p.id));
-    selected.clear();
-    save();
-    render();
-    $("result").textContent = "Sélection supprimée de ta liste FANTOM.";
+    if(!confirm("Supprimer tous les profils enregistrés dans FANTOM ?")) return;
+    profiles=[];
+    currentId=null;
+    save();render();
+    $("profileView").className="empty";
+    $("profileView").textContent="Tous les profils ont été supprimés.";
+    $("msgCount").value="";
+    $("photoCount").value="";
   });
 
   render();
